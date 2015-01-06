@@ -1,16 +1,28 @@
+// main driving program
+
 #include<iostream>
 #include "CellularAutomata.h"
-#include<windows.h>
 
-// Debug
-// test getters
-// test setters
+// Dimensions of cellular automata
+#define ROWS 10
+#define COLUMNS 10
 
-// Pass by reference
+// Improvements
 
-// how to access adjacent objects in object arrays , how about function call
+// automate better with run time allocation using new array of pointers to single rows with required columns;
+
+// To print in color include windows .h #include<windows.h>
 
 // improve performance with use of iterators
+
+// paralled computing
+// omp opm .h macro par par for parallel computing
+
+
+// Check linking options in Dev C++ 
+// In function definition - undefined reference to static variable , linker error -o
+
+// Pass by reference
 
 // if array of objects how to call function
 //                     how to access data members of objects of same class
@@ -21,13 +33,12 @@ int main()
  {
  	int i;
  	int j;
+ 	int simulation = 0;
  	
  	// number of time the simulations has to be run
- 	int itr = 5;
+ 	int itr = 5; 	 	
  	
- 	int rows = 10;
- 	int columns = 10;
- 	
+ 	// Default values of properties of Biological cell and ECM Site
  	int type = 0;
 	float stiffness = 0.5;
 	float divisionRate = 0.5;
@@ -38,77 +49,69 @@ int main()
 	float sensingRadius = 1;
 	int fiberDensity = 5;
 	float crossLinking = 0.5;
- 	
- 	// set the rows and columns in Cellular Automata
- 	// Bhai! Static member ko set aur update kaise kare , member function , static member function
- 	// variable ko public kare - that over looks why OOPS was used
- 	
- 	// automate better with run time allocation using new array of pointers to single rows with required columns;
+ 	 	 	 	 	 		
+	//Setting dimensions with padding 
  	CellularAutomata CA[12][12];
  	// Default constructor called on creation of two dimension array of computation cell
  	// Default set to ECM Sites type
  	
- 	// row and columns considered as 10 * 10 , with padding row and columns on both sides
- 	// The padding bounds the cell structure, also had default values, but are not considered for updating
+	// set the rows and columns in Cellular Automata
+ 	CA[0][0].setRows(ROWS);
+ 	CA[0][0].setColumns(COLUMNS); 	  	 	 	 	
  	
- 	int initialState[12][12] = {0};
- 	int currentState[12][12] = {0};
- 	//int color[12][12] = {7};
- 	float divRate[12][12] = {0.0};
+ 	// row and columns considered as 10 * 10 , with padding row and columns on both sides
+ 	// The padding bounds the cell structure, also had default properties values, but are not considered for updating
+ 	
+//you already have these values , why create once again
+	
+	//We can use an array for initail state of types of cells in Cellular Automata
+ 	
+	int initialState[12][12] = {0};
+ 	int currentState[12][12] = {0}; 	
+ 	
  	
  	// considering the center cell as Biological cell 	
- 	initialState[6][6] = 1;
+ 	initialState[3][3] = 1;
+ 	initialState[5][5] = 1;
+	initialState[5][6] = 1;
+	initialState[6][6] = 1;
+	initialState[5][6] = 1;
+	initialState[8][8] = 1;
+	initialState[8][9] = 1;
+	
+	initialState[7][2] = 1;
+	initialState[7][3] = 1;
+	initialState[8][2] = 1;
+	initialState[8][3] = 1;
  	
  	
- 	// set the rows and columns in Cellular Automata
+ 	cout<<"\nDefault Values set - \n";
+ 	
+ 	CA[0][0].printCellularAutomata(CA); 	 	 	
+ 	
+	// For User defined cell grid of cell types , set property values
+		
  	// use the layout to initialise user/pre defined ualues of Biological Cell and ECM Site
- 	for( i=0; i<rows /* row -1 if padding*/ ; i++ )
- 	 {
- 	 	for ( j=0; j<columns /* columns -1  if padding considered */; j++ )
- 	 	 {
- 	 	 	// user / pre  defined values , and parameter list
- 	 	 	
- 	 	 	if( initialState[i][j] == 1 )
- 	 	 	 {
- 	 	 	 	// parameter list
- 	 	 	 	// type, stiffness, divisionRate, size,	contractility, invasiveness, degradationPotential, sensingRadius
- 	 	 	 	
- 	 	 	 	CA[i][j].setBiologicalCellProperties(type, stiffness, divisionRate, size,	contractility, invasiveness, degradationPotential, sensingRadius); 	 	 	 	          	 	 	 			 
- 	 	 	 	currentState[i][j] = 1;
- 	 	 	 	//color[i][j] = 7;
- 	 	 	 }
- 	 	 	else
- 	 	 	 {
- 	 	 	 	// parameter list
- 	 	 	 	// type, fiberDensity, crossLinking
- 	 	 	 	CA[i][j].setECMSiteProperties(type, fiberDensity, crossLinking);
- 	 	 	 	currentState[i][j] = 0;
- 	 	 	 	//color[i][j] = 2;
- 	 	 	 }
- 	 	 }
- 	 }
- 	
+ 	 	
+ 	for( i=1; i<= CA[0][0].getRows(); i++ )
+	 	 {
+	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
+	 	 	 {
+	 	 	 	CA[i][j].setType(initialState[i][j]);
+	 	 	 }
+	 	 }
+	
+	cout<<"\nUser defined Biological Cell , ES Set - \n";
+	
+	CA[0][0].printCellularAutomata(CA);	 	
+	
  	
  	while( itr != 0 )
  	 {
- 	 	// paralled computing
- 		// omp opm .h macro par par for
-
-		for( i=1; i<=rows; i++ )
-	 	 {
-	 	 	for ( j=1; j<=columns; j++ )
-	 	 	 {
-	 	 	 	CA[i][j].update(i,j,currentState);
-	 	 	 	
-	 	 	 	if( CA[i][j].isBiologicalCell() )
-	 	 	 	 {
-	 	 	 	 	//color[i][j] = int ( color[i][j] * CA[i][j].getDivisionRate() );
-	 	 	 	 	divRate[i][j] = CA[i][j].getDivisionRate();
-	 	 	 	 }	 	 	 	
-	 	 	 }
-	 	 } 		
+ 	 	cout <<"\n Simulation - "<<++simulation;
+		CA[0][0].update(CA);
  	 	
- 	 	CA[0][0].printCellularAutomata(rows, columns, currentState , divRate);
+ 	 	CA[0][0].printCellularAutomata(CA);
  	 	 	 	
  	 	cout<<endl<<endl;
  	 	

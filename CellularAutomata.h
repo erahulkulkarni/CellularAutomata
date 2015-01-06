@@ -1,17 +1,22 @@
 #include<windows.h>
+
+// class of Cellular Automata - containing properties of Biological Cell and ECM Sites
+
 // problem - rows and columns as static
 // update possible / not with them as private
 
 // Check linking options in Dev C++ 
 // In function definition - undefined reference to static variable , linker error -o
 
+// generate state function
+
 using namespace std;
 
 class CellularAutomata
  {
- 	//class variables  	
- 	
-/* 	public: 	 		
+ 	//class variables  	 	
+
+ 	private:
 	//Variables to set dimensions of Cellular Automata
  	// rows for number of rows
  	// columns for number of columns
@@ -19,8 +24,8 @@ class CellularAutomata
  	// static to create only one copy of varaibles rows and columns
 	static int rows;
  	static int columns; 	 	
-*/ 	
- 	private:
+	
+	
 	//Variable to identify if Computational Cell is a Biological Cell or ECM Site
  	// type set to 1 - considered as Biological Cell
  	// type set to 0 - considered as ECM site
@@ -77,7 +82,6 @@ class CellularAutomata
 	 	
  	//getters and setters	
 
-/*
 	static int getRows();
 	   	
 	static void setRows(int);
@@ -85,7 +89,7 @@ class CellularAutomata
 	static int getColumns();
 	   	
 	static void setColumns(int);
-*/	
+
 	 
 	int getType();
 	
@@ -139,6 +143,8 @@ class CellularAutomata
 	int getCrossLinking();
 	
 	void setCrossLinking( float  );
+
+	void setProperties(CellularAutomata[][12], int , float , float , int , float , float , float , float, int , float );
 	
 	// set user defined values to Biological Cell 	
  	
@@ -148,7 +154,9 @@ class CellularAutomata
  	void setECMSiteProperties( int , int , float );
 	
 	// Generic function to set properties of Computational Cell	
-	void update(int, int, int[12][12] );
+	void update(CellularAutomata[][12] );
+	
+	void updateDivisionRate(CellularAutomata[][12],int,int);
 	
 	// function to set properties of Computational Cell	- now as BiologicalCell
 	void updateBiologicalCellProperties();
@@ -156,9 +164,16 @@ class CellularAutomata
 	// function to set properties of Computational Cell	- now as ECM Site
 	void updateECMSiteProperties();
 	
-	void printCellularAutomata( int, int, int[12][12] , float[12][12] );
+	void printCellularAutomata( CellularAutomata[][12] );
+	
+	void printCellularAutomata( );
 		 
  };
+
+// This is required so the compiler has a place for the static variable
+
+ int CellularAutomata::rows=0;
+ int CellularAutomata::columns=0; 
  
 	CellularAutomata::CellularAutomata()
  	 {
@@ -176,44 +191,46 @@ class CellularAutomata
 		fiberDensity = 5;
 		crossLinking = 0.5;
  	 } 
- 
-	CellularAutomata::CellularAutomata( int t, float stiff, float dr, int size, float c, float i, float dp, float sr , int fd, float cl)
+
+// type, stiffness, divisionRate, size,	contractility, invasiveness, degradationPotential, sensingRadius
+	 	 	 	 	// type, fiberDensity, crossLinking 
+	CellularAutomata::CellularAutomata( int type, float stiffness, float divisionRate, int size, float contractility, float invasiveness, float degradationPotential, float sensingRadius , int fiberDensity, float crossLinking)
  	 {
- 	 	type = t;
+ 	 	this->type = type;
  	 	
-		stiffness = stiff;
-		divisionRate = dr;
+		this->stiffness = stiffness;
+		this->divisionRate = divisionRate;
 		this->size = size;
-		contractility = c;
-		invasiveness = i;
-		degradationPotential = dp;
+		this->contractility = contractility;
+		this->invasiveness = invasiveness;
+		this->degradationPotential = degradationPotential;
 		
-		sensingRadius = sr;
+		this->sensingRadius = sensingRadius;
 				
-		fiberDensity = fd;
-		crossLinking = cl;
+		this->fiberDensity = fiberDensity;
+		this->crossLinking = crossLinking;
  	 }   	 
 
-	CellularAutomata::CellularAutomata( int t, float stiff, float dr, int size, float c, float i, float dp, float sr = 1)
+	CellularAutomata::CellularAutomata( int type, float stiffness, float divisionRate, int size, float contractility, float invasiveness, float degradationPotential, float sensingRadius)
  	 {
- 	 	type = 1;
+ 	 	this->type = type;
  	 	
-		stiffness = stiff;
-		divisionRate = dr;
+		this->stiffness = stiffness;
+		this->divisionRate = divisionRate;
 		this->size = size;
-		contractility = c;
-		invasiveness = i;
-		degradationPotential = dp;
+		this->contractility = contractility;
+		this->invasiveness = invasiveness;
+		this->degradationPotential = degradationPotential;
 		
-		sensingRadius = sr;
- 	 }  
+		this->sensingRadius = sensingRadius; 	 
+	 }  
  	
-	CellularAutomata::CellularAutomata( int t, int fd, float cl)
+	CellularAutomata::CellularAutomata( int type, int fiberDensity, float crossLinking)
  	 {
- 	 	type = 0;
- 	 	
- 	 	fiberDensity = fd;
-		crossLinking = cl;
+ 	 	this->type = type; 	 	
+				
+		this->fiberDensity = fiberDensity;
+		this->crossLinking = crossLinking;
  	 }     	 	 
 
 	 
@@ -327,12 +344,10 @@ class CellularAutomata
 	 	crossLinking = c;
 	 } 	 
 
-	void CellularAutomata::update( int i, int j, int currentState[12][12] )
+	void CellularAutomata::update( CellularAutomata CA[][12] )
 	 {
-	 	int tes = 0;
-	 	
-	 	int m;
-	 	int n;
+	 	int i;
+	 	int j;
 	 	
 	 	// neighbours straight forward for inner cells than the boundary cell	 	
 	 	// for boundary cell - neighbours be toroid using modulus to find neighbours if cell in first row, column or last row, column
@@ -342,43 +357,69 @@ class CellularAutomata
 	 	// initial check cell m = -1 or -2 . .  depends on sensing radius
 	 	// assumption of sensing radius = 1
 	 	
-	 	for( m=-1; m<2; m++ ) 
+	 	//cout<<"\n In Update Function - ";
+	 	
+	 	for( i=1; i<= CA[0][0].getRows() ; i++ )
 	 	 {
-	 	 	for( n=-1; n<2; n++ )
+	 	 	for( j=1; j<=CA[0][0].getColumns(); j++ )
 	 	 	 {
-	 	 	 	// this -> isECMSite() will point to same object 
 	 	 	 	
-	 	 	 	if( !( m==0 && n==0 ) && currentState[i][j] == 0 )
+	 	 	 	CA[i][j].updateDivisionRate(CA,i,j);
+				   	 	 	 		 	 	 	
+		 	}
+	 	 }	 				 		 		 	
+	 	
+	 }
+
+	void CellularAutomata::setProperties( CellularAutomata CA[][12] , int type, float stiffness, float divisionRate, int size, float contractility, float invasiveness, float degradationPotential, float sensingRadius , int fiberDensity, float crossLinking )
+	 {
+	 	int i;
+	 	int j;
+	 	
+	 	for( i=1; i<= CA[0][0].getRows(); i++ )
+	 	 {
+	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
+	 	 	 {
+	 	 	 	// user / pre  defined values , and parameter list
+	 	 	 	
+	 	 	 	if( CA[i][j].isBiologicalCell() )
 	 	 	 	 {
-	 	 	 	 	tes ++;
+	 	 	 	 	// parameter list
+	 	 	 	 	// type, stiffness, divisionRate, size,	contractility, invasiveness, degradationPotential, sensingRadius
+	 	 	 	 	type = 1;
+	 	 	 	 	CA[i][j].setBiologicalCellProperties(type, stiffness, divisionRate, size,	contractility, invasiveness, degradationPotential, sensingRadius);	 	 	 	 	
+	 	 	 	 }
+	 	 	 	else
+	 	 	 	 {
+	 	 	 	 	// parameter list
+	 	 	 	 	// type, fiberDensity, crossLinking
+	 	 	 	 	type = 0;
+	 	 	 	 	CA[i][j].setECMSiteProperties(type, fiberDensity, crossLinking);	 	 	 	 	
 	 	 	 	 }
 	 	 	 }
 	 	 }
-	 	
-	 	this -> setDivisionRate( (float) tes / ( (float) (tes + 1) ) );
-	 	
-	 }
-	 	
- 	void CellularAutomata::setBiologicalCellProperties( int t, float stiff, float dr, int size, float c, float i, float dp, float sr )
+	 
+	 }	 	
+ 	void CellularAutomata::setBiologicalCellProperties( int type, float stiffness, float divisionRate, int size, float contractility, float invasiveness, float degradationPotential, float sensingRadius )
  	 {
- 	 	type = t;
+ 	 	this->type = type;
  	 	
-		stiffness = stiff;
-		divisionRate = dr;
+		this->stiffness = stiffness;
+		this->divisionRate = divisionRate;
 		this->size = size;
-		contractility = c;
-		invasiveness = i;
-		degradationPotential = dp;
+		this->contractility = contractility;
+		this->invasiveness = invasiveness;
+		this->degradationPotential = degradationPotential;
 		
-		sensingRadius = sr;
+		this->sensingRadius = sensingRadius;
  	 }
  	 	
- 	void CellularAutomata::setECMSiteProperties( int t, int fd, float cl )
+ 	void CellularAutomata::setECMSiteProperties( int type, int fiberDensity, float crossLinking )
  	 {
- 	 	type = t;
+ 	 	this->type = type;
  	 					
-		fiberDensity = fd;
-		crossLinking = cl;
+		this->fiberDensity = fiberDensity;
+		this->crossLinking = crossLinking;
  	 }
 	
 	void CellularAutomata::updateBiologicalCellProperties()
@@ -404,39 +445,64 @@ class CellularAutomata
 		crossLinking = 0.5;
 	 }
 	 
-	void CellularAutomata::printCellularAutomata( int rows, int columns, int currentState[12][12]  , float divRate[12][12] )
-	 {
-	 	char colorString[9]="color 1A";
-	 	for( int i=1; i<=rows; i++ )	 	
+	void CellularAutomata::printCellularAutomata( CellularAutomata CA[][12] )
+	 {	
+	 	int i;
+	 	int j;
+	 	
+	 	cout<<endl;
+	 	cout.precision(2);
+	 	
+	 	for( i=1; i<=CA[0][0].getRows(); i++ )	 	
 	 	 {
-	 	 	for( int j=1; j<=columns; j++ )
+	 	 	for( j=1; j<=CA[0][0].getColumns(); j++ )
 	 	 	 {	 	 	 	
-	 	 	 	if( currentState[i][j] == 1 )	 	 	 	    
+	 	 	 	if( CA[i][j].isBiologicalCell() )	 	 	 	
 	 	 	 	 {
-	 	 	 	 	//colorString[8] = int (color[i][j] );
-	 	 	 	 	
-	 	 	 	 	//system(colorString); // the colours are from 1 to 15. 		
-	 	 	 	 	cout<<" bc"<<divRate[i][j];
+	 	 	 	 	cout<<"bc"<<CA[i][j].getDivisionRate()<<"  ";
 	 	 	 	 }
 	 	 	 	else
-				 {
-				 	colorString[8] = 'A';
-					cout<<"   es";
+				 {				 	
+					cout<<"es      ";
 				 } 
 	 	 	 }
 	 	 	cout<<endl; 
 	 	 }
 	 } 
 
-/*	
+	void CellularAutomata::printCellularAutomata( )
+	 {
+	 	cout<<"\n The content of Comptational Cell is : \n";
+	 	
+	 	cout<<"\n Type - "<<this->getType();	 	 	
+	 	
+	 	cout<<"\n Stifness - "<<this->getStiffness();
+	 	
+	 	cout<<"\n Divison Rate - " << this->getDivisionRate();
+	 	
+	 	cout<<"\n Size - " << this->getSize();
+	
+	 	cout<<"\n Contractility - "<< this->getContractility();
+	 	
+	 	cout<<"\n Invasiveness - "<<this->getInvasiveness();
+	 	
+	 	cout<<"\n Degradation Potential - "<<this->getDegradationPotential();
+	 	
+	 	cout<<"\n Sensing Radius - "<<this->getSensingRadius();
+	 	
+	 	cout<<"\n Fiber Density - "<<this->getFiberDensity();
+	 	
+	 	cout<<"\n Cross Linking - "<<this->getCrossLinking();
+	 }
+
 	int CellularAutomata::getRows()
- 	 { 	 	
- 	 	return rows;
+ 	 {
+	  return rows;
  	 }
 	   	
 	void CellularAutomata::setRows(int r)
 	 {
-	 	rows = 5;
+	 	rows = r;
 	 }
 	 
 	int CellularAutomata::getColumns()
@@ -447,5 +513,34 @@ class CellularAutomata
 	void CellularAutomata::setColumns(int c)
 	 {
 	 	columns = c;
+	 }	 
+	
+	void CellularAutomata::updateDivisionRate( CellularAutomata CA[][12], int i, int j ) 
+	 {
+	 	int tes = 0;
+	 	
+	 	int m;
+	 	int n;
+	 	
+	 	if( this->isBiologicalCell() )
+	 	 	 	 {
+	 	 	 	 	//cout<<"\n Biological cell -";
+	 	 	 	 	
+					tes = 0;
+					
+				 	for( m=-1; m<2; m++ ) 
+				 	 {
+				 	 	for( n=-1; n<2; n++ )
+				 	 	 {				 	 	 					 	 	 	
+				 	 	 	if( !( m==0 && n==0 ) && CA[i+m][j+n].isECMSite() )
+				 	 	 	 {
+				 	 	 	 	tes ++;
+				 	 	 	 }
+				 	 	 }
+				 	 }
+
+				 	this->setDivisionRate( (float) tes / ( (float) (tes + 1) ) );
+	 	 	 	 	
+	 	 	 	 }
+	 	
 	 }
-*/	 
