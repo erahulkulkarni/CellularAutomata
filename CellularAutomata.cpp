@@ -3,6 +3,8 @@
 
 #include<iostream>
 #include "CellularAutomata.h"
+#include<time.h>
+#include<stdlib.h>
 
 // Dimensions of cellular automata
 #define ROWS 10
@@ -30,6 +32,10 @@
 
 // Pass by reference
 
+// Check Divide by zero problem , no exception thrown
+
+// Try graph , form file with same parameters
+
 int main()
  {
  	int i;
@@ -38,7 +44,7 @@ int main()
  	int simulation = 0;
  	
  	// number of time the simulations has to be run
- 	int itr = 5; 	 	
+ 	int itr = 1; 	 	
  	
  	// Default values of properties of Biological cell and ECM Site
  	int type = 0;
@@ -119,20 +125,40 @@ int main()
  	// Initialise random number generator
 	srand (time(NULL));
  	
+ 	cout<<"\n Initial State\n Division Rate - "; 	
+ 	CA[0][0].printCellularAutomataDivisionRate(CA);
+ 	
+	cout<<"\n Stiffness - ";
+	CA[0][0].printCellularAutomataStiffness(CA);
+	
+	cout<<"\n Degradation Potential - ";
+ 	CA[0][0].printCellularAutomataDegradationPotential(CA);
+ 	
+ 	cout<<"\n Fiber Density - ";
+ 	CA[0][0].printCellularAutomataFiberDensity(CA);
+		   	
  	while( itr != 0 )
  	 {
  	 	cout <<"\n Simulation - "<<++simulation;
  	 	
-		CA[0][0].update(CA);
- 	 	
- 	 	CA[0][0].printCellularAutomata(CA);
+		CA[0][0].update(CA); 	 	
  	 	 	 	
  	 	cout<<endl<<endl;
  	 	
- 	 	itr--;
+ 	 	itr--; 	 	
  	 }
  	
+ 	cout<<"\n State After "<<simulation<<"iterations\n Division Rate - "; 	
+ 	CA[0][0].printCellularAutomataDivisionRate(CA);
  	
+	cout<<"\n Stiffness - ";
+	CA[0][0].printCellularAutomataStiffness(CA);
+	
+	cout<<"\n Degradation Potential - ";
+ 	CA[0][0].printCellularAutomataDegradationPotential(CA);
+ 	
+ 	cout<<"\n Fiber Density - ";
+ 	CA[0][0].printCellularAutomataFiberDensity(CA);
  	
  	return(0);
  }
