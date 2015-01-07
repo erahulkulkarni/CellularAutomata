@@ -1,3 +1,4 @@
+
 // main driving program
 
 #include<iostream>
@@ -33,6 +34,7 @@ int main()
  {
  	int i;
  	int j;
+ 	int k;
  	int simulation = 0;
  	
  	// number of time the simulations has to be run
@@ -71,23 +73,30 @@ int main()
  	
  	
  	// considering the center cell as Biological cell 	
- 	initialState[3][3] = 1;
- 	initialState[5][5] = 1;
-	initialState[5][6] = 1;
-	initialState[6][6] = 1;
-	initialState[5][6] = 1;
-	initialState[8][8] = 1;
-	initialState[8][9] = 1;
-	
-	initialState[7][2] = 1;
-	initialState[7][3] = 1;
-	initialState[8][2] = 1;
-	initialState[8][3] = 1;
+ 	// Biological cells centered in the 10*10 Cellular Automata , of dimensions 3 * 3
  	
+ 	for ( i=4; i<=6; i++ )
+ 	 {
+ 	 	for( j=4; j<=6; j++ )
+ 	 	 {
+ 	 	 	initialState[i][j] = 1;
+ 	 	 }
+ 	 } 	
  	
  	cout<<"\nDefault Values set - \n";
  	
- 	CA[0][0].printCellularAutomata(CA); 	 	 	
+ 	k=1;
+ 	for( i=1; i<= CA[0][0].getRows(); i++ )
+	 	 {
+	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
+	 	 	 {	 	 	 	
+	 	 	 	CA[i][j].setIdentity(k++);
+	 	 	 }
+	 	 }
+ 	
+	CA[0][0].printCellularAutomata(CA);
+ 	
+ 	
  	
 	// For User defined cell grid of cell types , set property values
 		
@@ -98,17 +107,22 @@ int main()
 	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
 	 	 	 {
 	 	 	 	CA[i][j].setType(initialState[i][j]);
+	 	 	 	cout<<"\t"<<CA[i][j].getIdentity();
 	 	 	 }
+	 	 	cout<<"\n";
 	 	 }
 	
 	cout<<"\nUser defined Biological Cell , ES Set - \n";
 	
 	CA[0][0].printCellularAutomata(CA);	 	
 	
+ 	// Initialise random number generator
+	srand (time(NULL));
  	
  	while( itr != 0 )
  	 {
  	 	cout <<"\n Simulation - "<<++simulation;
+ 	 	
 		CA[0][0].update(CA);
  	 	
  	 	CA[0][0].printCellularAutomata(CA);
