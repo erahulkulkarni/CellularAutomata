@@ -5,11 +5,18 @@
 #include "CellularAutomata.h"
 #include<time.h>
 #include<stdlib.h>
+#include <fstream>
 
 
 // Dimensions of cellular automata
 #define ROWS 10
 #define COLUMNS 10
+
+// Check efficient random number generation - integers and (0,1)
+
+// order of execution of updates to cells
+
+// Free Space in Neighbourhood - check for ECM sites in Neighbourhood
 
 // Improvements
 
@@ -19,8 +26,6 @@
 
 // automate better with run time allocation using new array of pointers to single rows with required columns;
 
-// To print in color include windows .h #include<windows.h>
-
 // improve performance with use of iterators
 
 // paralled computing
@@ -29,13 +34,6 @@
 
 // Check linking options in Dev C++ 
 // In function definition - undefined reference to static variable , linker error -o
-
-// Pass by reference
-
-// if array of objects how to call function
-//                     how to access data members of objects of same class
-
-// Pass by reference
 
 // Check Divide by zero problem , no exception thrown
 
@@ -49,7 +47,7 @@ int main()
  	int simulation = 0;
  	
  	// number of time the simulations has to be run
- 	int itr = 20; 	 	
+ 	int itr = 2; 	 	
  	
  	// Default values of properties of Biological cell and ECM Site
  	int type = 0;
@@ -114,58 +112,26 @@ int main()
 	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
 	 	 	 {
 	 	 	 	CA[i][j].setType(initialState[i][j]);
-	 	 	 	cout<<"\t"<<CA[i][j].getIdentity();
 	 	 	 }
-	 	 	cout<<"\n";
 	 	 }
 	
-	cout<<"\nUser defined Biological Cell , ES Set - \n";		
+	cout<<"\nUser defined Biological Cell , ES Set - \n";
 	
  	// Initialise random number generator
 	srand (time(NULL));
- 	
- 	/*
- 	cout<<"\n Initial State\n Division Rate - "; 	
- 	CA[0][0].printCellularAutomataDivisionRate(CA);
- 	
-	cout<<"\n Stiffness - ";
-	CA[0][0].printCellularAutomataStiffness(CA);
-	
-	cout<<"\n Degradation Potential - ";
- 	CA[0][0].printCellularAutomataDegradationPotential(CA);
- 	
- 	cout<<"\n Fiber Density - ";
- 	CA[0][0].printCellularAutomataFiberDensity(CA);
-	*/
-	
-	CA[0][0].writeIdentityAndIterationsIntoFile(CA,itr);
+ 		
+	//CA[0][0].writeIdentityAndIterationsIntoFile(CA,itr);
  	
 	while( simulation != itr )
  	 {
  	 	cout <<"\n Simulation - "<<++simulation;
  	 	
-		CA[0][0].update(CA);				
+		CA[0][0].update(CA);		
 		
 		// now call write into file , instead of only once after iterations
-		// open file in apend mode  	 	
-		CA[0][0].writeResultsToFile(CA,itr);
- 	 }
- 	
- 	/*
- 	cout<<"\n State After "<<simulation<<"iterations\n Division Rate - "; 	
- 	CA[0][0].printCellularAutomataDivisionRate(CA);
- 	
-	cout<<"\n Stiffness - ";
-	CA[0][0].printCellularAutomataStiffness(CA);
-	
-	cout<<"\n Degradation Potential - ";
- 	CA[0][0].printCellularAutomataDegradationPotential(CA);
- 	
- 	cout<<"\n Fiber Density - ";
- 	CA[0][0].printCellularAutomataFiberDensity(CA);
- 	*/
- 	
- 	
+		// open file in apend mode  	 			
+		//CA[0][0].writeResultsToFile(CA,itr);
+ 	 } 	
  	
  	return(0);
  }

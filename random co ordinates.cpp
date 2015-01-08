@@ -8,14 +8,14 @@ using namespace std;
   {
   	int x;
   	int y;
-  	int itr = 20; 	 	
+  	int itr = 40; 	 	
   	
 	srand (time(NULL));
 	  
 	while( itr != 0 )
  	 {
- 	 		x = rand() % 10 + 1;
-			y = rand() % 10 + 1;
+ 	 		x = rand() % 3 - 1;
+			y = rand() % 3 - 1;
 			
 			cout<<"\n ( "<<x<<" , "<<y<<" )";
 			
