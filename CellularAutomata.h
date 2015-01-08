@@ -9,9 +9,11 @@
 
 // generate state function
 
-#include<iostream>
+
 #include<stdlib.h>
 #include<time.h>
+#include <fstream>
+
 
 using namespace std;
 
@@ -180,6 +182,8 @@ class CellularAutomata
 	
 	void printCellularAutomata( CellularAutomata[][12] );
 	
+	void printCellularAutomataDivisionRate( CellularAutomata[][12] );	
+	
 	void printCellularAutomataStiffness( CellularAutomata[][12] );
 	
 	void printCellularAutomataDegradationPotential( CellularAutomata[][12] );
@@ -203,7 +207,9 @@ class CellularAutomata
 	int summationOfFiberDensityOfESInNeighbourhood( CellularAutomata[][12], int , int );
 	
 	float summationOfDegradationPotentialInNeighbourhood( CellularAutomata[][12], int , int );
-		 
+	
+	void writeIdentityAndIterationsIntoFile(CellularAutomata[][12], int);
+	void writeResultsToFile(CellularAutomata[][12], int);	 
  };
 
 // This is required so the compiler has a place for the static variable
@@ -853,18 +859,18 @@ class CellularAutomata
 	 	 	 {				 	 	 					 	 	 	
 	 	 	 	if( !( m==0 && n==0 ) && CA[i+m][j+n].isECMSite() )
 	 	 	 	 {
-	 	 	 	 	cout<<"\n [i+m]"<<i+m<<"\t[j+n]"<<j+n;
+	 	 	 	 	//cout<<"\n [i+m]"<<i+m<<"\t[j+n]"<<j+n;
 	 	 	 	 	
-					cout<<"\n CA[i+m][j+n].isECMSite() - "<<CA[i+m][j+n].isECMSite();
+					//cout<<"\n CA[i+m][j+n].isECMSite() - "<<CA[i+m][j+n].isECMSite();
 	 	 	 	 	
-	 	 	 	 	cout<<"\n CA[i+m][j+n].getFiberDensity() - "<<CA[i+m][j+n].getFiberDensity();
+	 	 	 	 	//cout<<"\n CA[i+m][j+n].getFiberDensity() - "<<CA[i+m][j+n].getFiberDensity();
 							 	 	 	 	
 					sumOfFiberDensityOfES = sumOfFiberDensityOfES + CA[i+m][j+n].getFiberDensity();
 	 	 	 	 }
 	 	 	 }
 	 	 }
 	 	 
-	 	 cout<<"\n Summation Of Fiber Density Of ES In Neighbourhood - " <<sumOfFiberDensityOfES;
+	 	 //cout<<"\n Summation Of Fiber Density Of ES In Neighbourhood - " <<sumOfFiberDensityOfES;
 	 	 
 	 	 return sumOfFiberDensityOfES;
 	 }
@@ -895,4 +901,118 @@ class CellularAutomata
 	 	 //cout<<"\n Summation Of Degradation Potential of BC In Neighbourhood - "<< sumOfDegradationPotential;
 	 	 
 	 	 return sumOfDegradationPotential;
+	 }
+	
+	void CellularAutomata::writeIdentityAndIterationsIntoFile(CellularAutomata CA[][12], int itr) 
+	 {
+	 	int i;
+	 	int j;
+	 	
+	 	ofstream divisionRateFileStream;	
+	 	ofstream stiffnessFileStream;
+	 	ofstream degradationPotentialFileStream;
+	 	ofstream fiberDensityFileStream;
+	 	
+		 	
+		divisionRateFileStream.open ("DivisionRate.txt");
+		
+		stiffnessFileStream.open ("Stiffness.txt");
+		
+		degradationPotentialFileStream.open ("DegradationPotential.txt");
+		
+		fiberDensityFileStream.open ("FiberDensity.txt");
+		
+		for( i=1; i<= CA[0][0].getRows(); i++ )
+	 	 {
+	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
+	 	 	 {
+	 	 	 	divisionRateFileStream << CA[i][j].getIdentity()<<" ";
+	 	 	 	stiffnessFileStream << CA[i][j].getIdentity()<<" ";
+	 	 	 	degradationPotentialFileStream << CA[i][j].getIdentity()<<" ";
+	 	 	 	fiberDensityFileStream << CA[i][j].getIdentity()<<" ";
+	 	 	 }
+			
+			divisionRateFileStream << endl;
+			stiffnessFileStream << endl;
+			degradationPotentialFileStream << endl;
+			fiberDensityFileStream << endl;
+	 	 }	 	 
+	 	
+		divisionRateFileStream << endl;
+		stiffnessFileStream << endl;
+		degradationPotentialFileStream << endl;
+		fiberDensityFileStream << endl;
+			
+	 	for( i = 1; i<=itr; i++ ) 
+	 	 {
+	 	 	divisionRateFileStream << i <<" ";
+	 	 	stiffnessFileStream << i <<" ";
+	 	 	degradationPotentialFileStream << i <<" ";
+	 	 	fiberDensityFileStream << i <<" ";
+	 	 }
+	 	 
+		divisionRateFileStream << endl;
+		stiffnessFileStream << endl;
+		degradationPotentialFileStream << endl;
+		fiberDensityFileStream << endl;
+	 	
+	 	
+		divisionRateFileStream.close();
+		
+		stiffnessFileStream.close();
+		
+		degradationPotentialFileStream.close();
+		
+		fiberDensityFileStream.close();
+	 	
+	 }
+	void CellularAutomata::writeResultsToFile(CellularAutomata CA[][12], int itr)
+	 {
+	 	int i;
+	 	int j;
+	 	
+	 	ofstream divisionRateFileStream;	
+	 	ofstream stiffnessFileStream;
+	 	ofstream degradationPotentialFileStream;
+	 	ofstream fiberDensityFileStream;
+	 	
+		 	
+		divisionRateFileStream.open ("DivisionRate.txt", ios::app);
+		
+		stiffnessFileStream.open ("Stiffness.txt", ios::app);
+		
+		degradationPotentialFileStream.open ("DegradationPotential.txt", ios::app);
+		
+		fiberDensityFileStream.open ("FiberDensity.txt", ios::app);
+		
+			divisionRateFileStream << endl;
+			stiffnessFileStream << endl;
+			degradationPotentialFileStream << endl;
+			fiberDensityFileStream << endl; 
+					
+		for( i=1; i<= CA[0][0].getRows(); i++ )
+	 	 {
+	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
+	 	 	 {
+	 	 	 	divisionRateFileStream << CA[i][j].getDivisionRate()<<" ";
+	 	 	 	stiffnessFileStream << CA[i][j].getStiffness()<<" ";
+	 	 	 	degradationPotentialFileStream << CA[i][j].getDegradationPotential()<<" ";
+	 	 	 	fiberDensityFileStream << CA[i][j].getFiberDensity()<<" ";
+	 	 	 }
+	 	 	
+			divisionRateFileStream << endl;
+			stiffnessFileStream << endl;
+			degradationPotentialFileStream << endl;
+			fiberDensityFileStream << endl; 
+	 	 }	 	 
+	 	
+	 	
+		divisionRateFileStream.close();
+		
+		stiffnessFileStream.close();
+		
+		degradationPotentialFileStream.close();
+		
+		fiberDensityFileStream.close();
+
 	 }

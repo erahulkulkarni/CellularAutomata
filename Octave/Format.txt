@@ -1,0 +1,23 @@
+Identity of Cells as Matrix of Integers
+
+Number Of Iterations or time
+
+Martix of vlaues of properties of each cell
+
+Martix of vlaues of properties of each cell
+
+ |
+
+ |
+
+identity = dlmread("Results.txt",' ',[0,0,0,1])
+
+time = dlmread("Results.txt",' ',[1,0,1,9])
+
+properties = dlmread("Results.txt",' ',[2,0,3,9])
+
+
+ plot(time,properties(1,:),";t1;",properties(2,:),";t2;")
+ title("Degradation Potential")
+ xlabel("Time")
+ ylabel("Rate")

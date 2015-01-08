@@ -6,11 +6,16 @@
 #include<time.h>
 #include<stdlib.h>
 
+
 // Dimensions of cellular automata
 #define ROWS 10
 #define COLUMNS 10
 
 // Improvements
+
+// pointer to function for similar structure functions that only vary in function call in core of loops
+// like print automata state in division rate, fiber density, degradation potential . . 
+// writing results into file
 
 // automate better with run time allocation using new array of pointers to single rows with required columns;
 
@@ -44,7 +49,7 @@ int main()
  	int simulation = 0;
  	
  	// number of time the simulations has to be run
- 	int itr = 1; 	 	
+ 	int itr = 20; 	 	
  	
  	// Default values of properties of Biological cell and ECM Site
  	int type = 0;
@@ -98,11 +103,7 @@ int main()
 	 	 	 {	 	 	 	
 	 	 	 	CA[i][j].setIdentity(k++);
 	 	 	 }
-	 	 }
- 	
-	CA[0][0].printCellularAutomata(CA);
- 	
- 	
+	 	 } 			 	
  	
 	// For User defined cell grid of cell types , set property values
 		
@@ -118,13 +119,12 @@ int main()
 	 	 	cout<<"\n";
 	 	 }
 	
-	cout<<"\nUser defined Biological Cell , ES Set - \n";
-	
-	CA[0][0].printCellularAutomata(CA);	 	
+	cout<<"\nUser defined Biological Cell , ES Set - \n";		
 	
  	// Initialise random number generator
 	srand (time(NULL));
  	
+ 	/*
  	cout<<"\n Initial State\n Division Rate - "; 	
  	CA[0][0].printCellularAutomataDivisionRate(CA);
  	
@@ -136,18 +136,22 @@ int main()
  	
  	cout<<"\n Fiber Density - ";
  	CA[0][0].printCellularAutomataFiberDensity(CA);
-		   	
- 	while( itr != 0 )
+	*/
+	
+	CA[0][0].writeIdentityAndIterationsIntoFile(CA,itr);
+ 	
+	while( simulation != itr )
  	 {
  	 	cout <<"\n Simulation - "<<++simulation;
  	 	
-		CA[0][0].update(CA); 	 	
- 	 	 	 	
- 	 	cout<<endl<<endl;
- 	 	
- 	 	itr--; 	 	
+		CA[0][0].update(CA);				
+		
+		// now call write into file , instead of only once after iterations
+		// open file in apend mode  	 	
+		CA[0][0].writeResultsToFile(CA,itr);
  	 }
  	
+ 	/*
  	cout<<"\n State After "<<simulation<<"iterations\n Division Rate - "; 	
  	CA[0][0].printCellularAutomataDivisionRate(CA);
  	
@@ -159,6 +163,9 @@ int main()
  	
  	cout<<"\n Fiber Density - ";
  	CA[0][0].printCellularAutomataFiberDensity(CA);
+ 	*/
+ 	
+ 	
  	
  	return(0);
  }
