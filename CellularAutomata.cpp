@@ -120,7 +120,7 @@ int main()
  	// Initialise random number generator
 	srand (time(NULL));
  		
-	//CA[0][0].writeIdentityAndIterationsIntoFile(CA,itr);
+	CA[0][0].writeIdentityAndIterationsIntoFile(CA,itr);
  	
 	while( simulation != itr )
  	 {
@@ -130,7 +130,7 @@ int main()
 		
 		// now call write into file , instead of only once after iterations
 		// open file in apend mode  	 			
-		//CA[0][0].writeResultsToFile(CA,itr);
+		CA[0][0].writeResultsToFile(CA,itr);
  	 } 	
  	
  	return(0);
