@@ -44,13 +44,18 @@ int main()
  	int i;
  	int j;
  	int k;
- 	int simulation = 0;
+ 	int simulation = 0;		//Counts from 0 to number of iterations
  	
  	// number of time the simulations has to be run
  	int itr = 2; 	 	
  	
  	// Default values of properties of Biological cell and ECM Site
+ 	
+ 	int identity = 0;
+ 	
  	int type = 0;
+ 	
+ 	int age = 0;
 	float stiffness = 0.5;
 	float divisionRate = 0.5;
 	int size = 1;
@@ -120,7 +125,7 @@ int main()
  	// Initialise random number generator
 	srand (time(NULL));
  		
-	CA[0][0].writeIdentityAndIterationsIntoFile(CA,itr);
+	CA[0][0].writeConstantsIdentityAndIterationsIntoFile(CA,itr);
  	
 	while( simulation != itr )
  	 {
@@ -130,7 +135,8 @@ int main()
 		
 		// now call write into file , instead of only once after iterations
 		// open file in apend mode  	 			
-		CA[0][0].writeResultsToFile(CA,itr);
+		
+		// CA[0][0].writeResultsToFile(CA,itr);
  	 } 	
  	
  	return(0);

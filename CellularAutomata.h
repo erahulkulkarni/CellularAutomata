@@ -8,6 +8,10 @@
 
 // generate state function
 
+// Fiber Density Going Negative
+
+// Optimize File Write function
+
 #include<stdlib.h>
 #include<time.h>
 #include <fstream>
@@ -20,8 +24,8 @@ using namespace std;
 #define TDC 3		// type 3 - Terminally Differentiated Cell
 
 #define ALPHA 0.5
-#define BETA 2
-#define GAMMA 8
+#define BETA 25
+#define GAMMA 50
 
 class CellularAutomata
  {
@@ -240,11 +244,11 @@ class CellularAutomata
 	
 	// Write identities and Iteration List into separate files for each Property
 	// CellularAutomata CA[][12], int itr
-	void writeIdentityAndIterationsIntoFile(CellularAutomata[][12], int);
+	void writeConstantsIdentityAndIterationsIntoFile(CellularAutomata[][12], int);
 	
 	// write results of Cellular Automata  into files for cell property 
 	// CellularAutomata CA[][12], int itr
-	void writeResultsToFile(CellularAutomata[][12], int);	 
+	void writeResultsToFile(CellularAutomata[][12], int, int, int);	 
 	
 	// Increment age of All Biological Cells by a unit
 	// CellularAutomata CA[][12]
@@ -281,10 +285,27 @@ class CellularAutomata
 		type = ECMSite;
  	 	
  	 	age = 0;
+		stiffness = 0.5;
+		divisionRate = 0.5;
+		size = 1;
+		contractility = 0.5;
+		invasiveness = 0.5;
+		degradationPotential = 0.5;
+		
+		sensingRadius = 1;
+		
+		fiberDensity = 5;
+		crossLinking = 0.5;
+		
+/*
+		type = ECMSite;
+ 	 	
+ 	 	age = 0;
 		stiffness = 0;
 		divisionRate = 0;
 		size = 0;
 		contractility = 0;
+		invasiveness = 0;
 		invasiveness = 0;
 		degradationPotential = 0;
 		
@@ -292,6 +313,7 @@ class CellularAutomata
 		
 		fiberDensity = 0;
 		crossLinking = 0;
+*/		
  	 } 
 	
 	// Parameterised constructor
@@ -508,7 +530,10 @@ class CellularAutomata
 	 	int j;
 	 	
 	 	int x;
-	 	int y;
+	 	int y;	 
+		
+		int temp;
+		int itr = 10; 		 	
 	 	
 	 	// neighbours straight forward for inner cells than the boundary cell	 	
 	 	// for boundary cell - neighbours be toroid using modulus to find neighbours if cell in first row, column or last row, column
@@ -537,7 +562,11 @@ class CellularAutomata
 			CA[x][y].updateStateOfTransientAmplifyingCell(CA,x,y);
 			CA[x][y].updateStateOfTerminallyDifferentiatedCell();
 			
-			CA[x][y].updateStateOfCancerStemCell(CA,x,y);			
+			CA[x][y].updateStateOfCancerStemCell(CA,x,y);
+			
+			//cin>>temp;
+			
+			this -> writeResultsToFile(CA,itr, x, y);
 	 	 }
 	 	
 	 }
@@ -585,6 +614,7 @@ class CellularAutomata
 		this->degradationPotential = degradationPotential;
 		
 		this->sensingRadius = sensingRadius;
+				
  	 }
  	 	
  	// int type, int fiberDensity, float crossLinking 
@@ -610,6 +640,10 @@ class CellularAutomata
 		degradationPotential = 0;
 		
 		sensingRadius = 0;
+		
+		// also - reseting all values of ECM Site properties
+		fiberDensity = 0;
+		crossLinking = 0;
 	 }
 	
 	// set default values to ECM Site
@@ -619,6 +653,18 @@ class CellularAutomata
  	 			
 		fiberDensity = 0;
 		crossLinking = 0;
+		
+		// also - reseting all values of Biological Cell properties
+ 	 	age = 0;
+		stiffness = 0;
+		divisionRate = 0;
+		size = 0;
+		contractility = 0;
+		invasiveness = 0;
+		degradationPotential = 0;
+		
+		sensingRadius = 0;
+
 	 }
 	 
 	// Update Division Rate of Biological Cell at (i,j)th loaction 
@@ -834,7 +880,7 @@ class CellularAutomata
 	 }
 	
 	// Write identities and Iteration List into separate files for each Property
-	void CellularAutomata::writeIdentityAndIterationsIntoFile(CellularAutomata CA[][12], int itr) 
+	void CellularAutomata::writeConstantsIdentityAndIterationsIntoFile(CellularAutomata CA[][12], int itr) 
 	 {
 	 	int i;
 	 	int j;
@@ -845,13 +891,21 @@ class CellularAutomata
 	 	ofstream stiffnessFileStream;
 	 	ofstream degradationPotentialFileStream;
 	 	ofstream fiberDensityFileStream;
+	 	ofstream crossLinkingFileStream;
+	 	ofstream ageFileStream;
+	 	ofstream typeFileStream;
 	 	
 		// Open file for each property
-		divisionRateFileStream.open ("DivisionRate.txt");		
-		stiffnessFileStream.open ("Stiffness.txt");		
-		degradationPotentialFileStream.open ("DegradationPotential.txt");		
+		divisionRateFileStream.open ("DivisionRate.txt");
+		stiffnessFileStream.open ("Stiffness.txt");
+		degradationPotentialFileStream.open ("DegradationPotential.txt");
 		fiberDensityFileStream.open ("FiberDensity.txt");
-		
+		crossLinkingFileStream.open ("CrossLinking.txt");
+		ageFileStream.open ("Age.txt");
+		typeFileStream.open ("Type.txt");
+
+		typeFileStream <<"ECMSite "<<ECMSite<<"\nCSC "<<CSC<<"\nTAC "<<TAC<<"\nTDC "<<TDC;
+		typeFileStream<<"\nALPHA "<<ALPHA<<"\nBETA "<<BETA<<"\nGAMMA "<<GAMMA<<endl;		
 		
 		// Write Identity of cells as a matrix which corresponding to cell location
 		for( i=1; i<= CA[0][0].getRows(); i++ )
@@ -864,18 +918,27 @@ class CellularAutomata
 	 	 	 	stiffnessFileStream << identity <<" ";
 	 	 	 	degradationPotentialFileStream << identity <<" ";
 	 	 	 	fiberDensityFileStream << identity <<" ";
+				crossLinkingFileStream<< identity <<" ";
+				ageFileStream<< identity <<" ";
+				typeFileStream<< identity <<" ";
 	 	 	 }
 			
 			divisionRateFileStream << endl;
 			stiffnessFileStream << endl;
 			degradationPotentialFileStream << endl;
 			fiberDensityFileStream << endl;
+			crossLinkingFileStream << endl;
+			ageFileStream << endl;
+			typeFileStream << endl;
 	 	 }	 	 
 	 	
 		divisionRateFileStream << endl;
 		stiffnessFileStream << endl;
 		degradationPotentialFileStream << endl;
 		fiberDensityFileStream << endl;
+		crossLinkingFileStream << endl;
+		ageFileStream << endl;
+		typeFileStream << endl;
 		
 		// written time iterations into file
 	 	for( i = 1; i<=itr; i++ ) 
@@ -884,23 +947,31 @@ class CellularAutomata
 	 	 	stiffnessFileStream << i <<" ";
 	 	 	degradationPotentialFileStream << i <<" ";
 	 	 	fiberDensityFileStream << i <<" ";
+	 	 	crossLinkingFileStream << i <<" ";
+			ageFileStream << i <<" ";
+			typeFileStream << i <<" ";
 	 	 }
 	 	 
 		divisionRateFileStream << endl;
 		stiffnessFileStream << endl;
 		degradationPotentialFileStream << endl;
 		fiberDensityFileStream << endl;
+		crossLinkingFileStream << endl;
+		ageFileStream << endl;
+		typeFileStream << endl;
 	 	
 	 	// Close file
 		divisionRateFileStream.close();		
 		stiffnessFileStream.close();		
 		degradationPotentialFileStream.close();		
 		fiberDensityFileStream.close();
-	 	
+		crossLinkingFileStream.close();
+		ageFileStream.close();
+		typeFileStream.close();
 	 }
 	 
 	// write results of Cellular Automata  into files for cell property 	
-	void CellularAutomata::writeResultsToFile(CellularAutomata CA[][12], int itr)
+	void CellularAutomata::writeResultsToFile(CellularAutomata CA[][12], int itr, int x, int y)
 	 {
 	 	int i;
 	 	int j;
@@ -910,19 +981,38 @@ class CellularAutomata
 	 	ofstream stiffnessFileStream;
 	 	ofstream degradationPotentialFileStream;
 	 	ofstream fiberDensityFileStream;
+		ofstream crossLinkingFileStream;
+	 	ofstream ageFileStream;
+	 	ofstream typeFileStream;
 	 	
 		// Open file for each property 	
 		divisionRateFileStream.open ("DivisionRate.txt", ios::app);		
 		stiffnessFileStream.open ("Stiffness.txt", ios::app);		
 		degradationPotentialFileStream.open ("DegradationPotential.txt", ios::app);		
 		fiberDensityFileStream.open ("FiberDensity.txt", ios::app);
-		
+		crossLinkingFileStream.open ("CrossLinking.txt", ios::app);
+		ageFileStream.open ("Age.txt", ios::app);
+		typeFileStream.open ("Type.txt", ios::app);
+				
 		divisionRateFileStream << endl;
 		stiffnessFileStream << endl;
 		degradationPotentialFileStream << endl;
 		fiberDensityFileStream << endl; 
-					
-		// Get Division Rate , Stiffness , Degradation Potential , Fiber Density for each cell and write it into respective files
+		crossLinkingFileStream << endl;
+		ageFileStream << endl;
+		typeFileStream << endl;
+		
+		
+		divisionRateFileStream << " ( " <<x <<" , " << y <<" )\n";
+		stiffnessFileStream <<  " ( " <<x <<" , " << y <<" )\n";
+		degradationPotentialFileStream <<  " ( " <<x <<" , " << y <<" )\n";
+		fiberDensityFileStream <<  " ( " <<x <<" , " << y <<" )\n";
+		crossLinkingFileStream <<  " ( " <<x <<" , " << y <<" )\n";
+		ageFileStream <<  " ( " <<x <<" , " << y <<" )\n";
+		typeFileStream <<  " ( " <<x <<" , " << y <<" )\n";
+									
+		// Get Division Rate , Stiffness , Degradation Potential , Fiber Density , Cross Linking , Age and Type
+		// for each cell and write it into respective files
 		for( i=1; i<= CA[0][0].getRows(); i++ )
 	 	 {
 	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
@@ -931,12 +1021,18 @@ class CellularAutomata
 	 	 	 	stiffnessFileStream << CA[i][j].getStiffness()<<" ";
 	 	 	 	degradationPotentialFileStream << CA[i][j].getDegradationPotential()<<" ";
 	 	 	 	fiberDensityFileStream << CA[i][j].getFiberDensity()<<" ";
+				crossLinkingFileStream << CA[i][j].getCrossLinking() <<" ";
+				ageFileStream << CA[i][j].getAge() <<" ";
+				typeFileStream << CA[i][j].getType() <<" ";
 	 	 	 }
 	 	 	
 			divisionRateFileStream << endl;
 			stiffnessFileStream << endl;
 			degradationPotentialFileStream << endl;
 			fiberDensityFileStream << endl; 
+			crossLinkingFileStream << endl;
+			ageFileStream << endl;
+			typeFileStream << endl;			
 	 	 }	 	 
 	 	
 	 	// Close file
@@ -944,6 +1040,9 @@ class CellularAutomata
 		stiffnessFileStream.close();		
 		degradationPotentialFileStream.close();		
 		fiberDensityFileStream.close();
+		crossLinkingFileStream.close();
+		ageFileStream.close();
+		typeFileStream.close();		
 	 }
 
 	// Increment age of All Biological Cells by a unit
