@@ -731,7 +731,7 @@ class CellularAutomata
 			
 			sumOfFiberDensity = summationOfFiberDensityOfESInNeighbourhood( CA, i, j );
 			
-			newDegradationPotential = ( (float) sumOfFiberDensity / ( (float) (tes + 10)  ) );
+			newDegradationPotential = ( (float) sumOfFiberDensity / ( (float) (sumOfFiberDensity + 2)  ) );
 
 		 	this->setDegradationPotential( newDegradationPotential );
  	 	 }
