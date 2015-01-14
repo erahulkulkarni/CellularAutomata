@@ -1,5 +1,12 @@
 \documentclass[a4paper,10pt]{article}
 \usepackage[utf8]{inputenc}
+\usepackage{subfig}
+\usepackage{amsmath}
+\usepackage{algorithm2e} %for psuedo code
+\usepackage[lmargin=3.81cm,tmargin=2.54cm,rmargin=2.54cm,bmargin=2.52cm]{geometry}
+
+%\usepackage{algorithm}
+%\usepackage[noend]{algpseudocode}
 
 %opening
 \title{Stiffness mediated heterogeneity}
@@ -19,9 +26,62 @@
 \subsection{Cell/ECM properties and their range}
 
 %Properties and their range
-\begin{table}
- 
+
+\begin{table}[!htb]
+
+
+
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \caption{Biological Cell}
+
+	  \begin{tabular}{|l|l|}
+	  \hline
+	  Prpoerty Name & Value \\ \hline
+	  age & %\[ \geq \]  
+	  0 \\ \hline
+	  type & \{1,2,3\} \\ \hline
+	  stiffness  & (0,1) \\ \hline
+	  divisionRate  & (0,1) \\ \hline
+	  size  & (0,1) \\ \hline
+	  contractility  & (0,1) \\ \hline
+	  invasiveness  & (0,1) \\ \hline
+	  degradationPotential & (0,1) \\ \hline
+	  sensingRadius & 1\\ \hline
+	  \end{tabular}
+        
+    \end{minipage}%    
+    \begin{minipage}{.5\textwidth}
+    
+	\above
+	
+        \centering
+        \caption{Biological Cell type}
+                
+	  \begin{tabular}{|l|l|}
+	  \hline
+	  Prpoerty Name - type & Value \\ \hline
+	  Cancer Stem Cell & 1 \\ \hline
+	  Transient Amplifying Cells & 2 \\ \hline
+	  Terminally Differentiated Cell  & 3 \\ \hline
+	  \end{tabular}        
+
+	\centering
+        \caption{ECM Site}	  	  
+	  \begin{tabular}{|l|l|}
+	  \hline
+	  Prpoerty Name & Value \\ \hline
+	  type & 0\\ \hline
+	  fiberDensity  & (1,10)\\ \hline
+	  crossLinking  & (0,1)\\ \hline
+	  \end{tabular}
+
+        
+        
+    \end{minipage}
 \end{table}
+
+
 
 
 \subsection{Function details}
@@ -54,17 +114,73 @@ where
 \end{equation}
 where BC is Biological Cell
 
+
+\subsubsection{Update State Of Cancer Stem Cell}
+\begin{algorithm}[H] %or another one check
+ \caption{Update State Of Cancer Stem Cell}
+     \SetAlgoLined
+     \KwData{present cell and neighbourhood cell details}
+     \KwResult{state of how to write algorithm with \LaTeX2e }
+     initialization\;
+     \While{not at end of this document}{
+      read current\;
+      \eIf{understand}{
+       go to next section\;
+       current section becomes this one\;
+       }{
+       go back to the beginning of current section\;
+      }
+     }
+
+\end{algorithm}
+
+\begin{verbatim}
+ if ( cell type = CSC )
+  {
+    select in random one free neighbourhood cell to update
+     
+      if ( an randomly selected value in (0,1) < ALPHA )
+       {
+         set the free cell type as Transient Amplifying Cell
+         set age = 0
+       }
+      else
+       {
+         set the free cell type as Cancer Stem Cell
+         set age = 0       
+       }
+  } 
+\end{verbatim}
+
 \subsubsection{Update State Of Transient Amplifying Cell}
-%\begin{verbatim}
-
-
-%\end{verbatim}
+\begin{verbatim}
+ if ( cell type = TAC )
+  {
+    if( the  age of cell >= BETA )
+     {
+      set this cell type as Terminally Differentiated Cell
+     }
+    else
+     {
+      select in random one free neighbourhood cell to update
+      set the free cell type as Transient Amplifying Cell
+      set age = 0      
+     }
+  } 
+\end{verbatim}
 
  
  
-
-
-
+\subsubsection{Update State Of Terminally Differentiated Cell }
+\begin{verbatim}
+ if ( cell type = TDC )
+  {
+    if( the  age of cell > GAMMA )
+     {
+      set this cell type as ECM Site
+     }
+  } 
+\end{verbatim}
 
 \section{Results}
 

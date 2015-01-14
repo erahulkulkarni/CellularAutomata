@@ -1,5 +1,12 @@
 \documentclass[a4paper,10pt]{article}
 \usepackage[utf8]{inputenc}
+\usepackage{subfig}
+\usepackage{amsmath}
+\usepackage{algorithm2e} %for psuedo code
+\usepackage[lmargin=3.81cm,tmargin=2.54cm,rmargin=2.54cm,bmargin=2.52cm]{geometry}
+
+%\usepackage{algorithm}
+%\usepackage[noend]{algpseudocode}
 
 %opening
 \title{Stiffness mediated heterogeneity}
@@ -19,32 +26,61 @@
 \subsection{Cell/ECM properties and their range}
 
 %Properties and their range
-Biological Cell
 
-\begin{tabular}{|l|l|}
-\hline
-Prpoerty Name & Value \\ \hline
-type \\ \hline
-age \\ \hline
-stiffness  & (0,1) \\ \hline
-divisionRate  & (0,1) \\ \hline
-size  & (0,1) \\ \hline
-contractility  & (0,1) \\ \hline
-invasiveness  & (0,1) \\ \hline
-degradationPotential & (0,1) \\ \hline
-sensingRadius & 1\\ \hline
-\end{tabular}
+\begin{table}[!htb]
 
 
 
-ECM Site
-\begin{tabular}{|l|l|}
-\hline
-Prpoerty Name & Value \\ \hline
-type & 0\\ \hline
-fiberDensity  & (1,10)\\ \hline
-crossLinking  & (0,1)\\ \hline
-\end{tabular}
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \caption{Biological Cell}
+
+	  \begin{tabular}{|l|l|}
+	  \hline
+	  Prpoerty Name & Value \\ \hline
+	  age & %\[ \geq \]  
+	  0 \\ \hline
+	  type & \{1,2,3\} \\ \hline
+	  stiffness  & (0,1) \\ \hline
+	  divisionRate  & (0,1) \\ \hline
+	  size  & (0,1) \\ \hline
+	  contractility  & (0,1) \\ \hline
+	  invasiveness  & (0,1) \\ \hline
+	  degradationPotential & (0,1) \\ \hline
+	  sensingRadius & 1\\ \hline
+	  \end{tabular}
+        
+    \end{minipage}%    
+    \begin{minipage}{.5\textwidth}
+    
+	\above
+	
+        \centering
+        \caption{Biological Cell type}
+                
+	  \begin{tabular}{|l|l|}
+	  \hline
+	  Prpoerty Name - type & Value \\ \hline
+	  Cancer Stem Cell & 1 \\ \hline
+	  Transient Amplifying Cells & 2 \\ \hline
+	  Terminally Differentiated Cell  & 3 \\ \hline
+	  \end{tabular}        
+
+	\centering
+        \caption{ECM Site}	  	  
+	  \begin{tabular}{|l|l|}
+	  \hline
+	  Prpoerty Name & Value \\ \hline
+	  type & 0\\ \hline
+	  fiberDensity  & (1,10)\\ \hline
+	  crossLinking  & (0,1)\\ \hline
+	  \end{tabular}
+
+        
+        
+    \end{minipage}
+\end{table}
+
 
 
 
@@ -78,17 +114,78 @@ where
 \end{equation}
 where BC is Biological Cell
 
+
+\subsubsection{Update State Of Cancer Stem Cell}
+\begin{algorithm}[H] %or another one check
+ \caption{Update State Of Cancer Stem Cell}
+     \SetAlgoLined
+     \KwData{present cell and neighbourhood cell details , \alpha }
+     \KwResult{state of one random free neighbourhood cell }
+     
+      \If{ cell type = Cancer Stem Cell }
+      {
+       check if there are free neighbourhood cell\;       
+       
+       \If{ if there are free neighbourhood cell }
+        {
+	  select one in random\;
+	  set age $\gets$  0\;        
+	  r $\gets$  random(0,1);
+	  
+	  \eIf{ r \textless \alpha\ }
+	    {
+	    set the free cell type as Transient Amplifying Cell\;        
+	    }
+	    {
+	    set the free cell type as Cancer Stem Cell\;
+	    }       
+        }                     
+      }
+\end{algorithm}
+
 \subsubsection{Update State Of Transient Amplifying Cell}
-%\begin{verbatim}
-
-
-%\end{verbatim}
-
+\begin{algorithm}[H] %or another one check
+ \caption{Update State Of Transient Amplifying Cell}
+     \SetAlgoLined
+     \KwData{present cell and neighbourhood cell details , \beta }
+     \KwResult{state of one random free neighbourhood cell }
+           
+     \If{ cell type = Transient Amplifying Cell }
+     {
+       \eIf{ if age of cell \textgreater \beta\ }
+        {
+          set the cell type as Terminally Differentiated Cell\;
+        }
+        {        
+	    check if there are free neighbourhood cell\;
+	    \If{ if there are free neighbourhood cell }
+	     {
+	      select one in random\;
+	      set the free cell type as Transient Amplifying Cell\;
+	      set age $\gets$  0\;
+	     } 
+	    
+        }                     
+      }
+\end{algorithm}
  
  
+\subsubsection{Update State Of Terminally Differentiated Cell }
 
-
-
+\begin{algorithm}[H] %or another one check
+ \caption{Update State Of Terminally Differentiated Cell}
+     \SetAlgoLined
+     \KwData{present cell , \gamma }
+     \KwResult{state of present cell }
+           
+     \If{ cell type = Terminally Differentiated Cell }
+     {
+       \If{ if age of cell \textgreater \gamma\ }
+        {
+          set the cell type as ECM Site\;
+        }
+      }
+\end{algorithm}
 
 \section{Results}
 

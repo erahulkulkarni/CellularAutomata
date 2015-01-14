@@ -38,6 +38,7 @@ using namespace std;
 #define BETA 25
 #define GAMMA 50
 
+#define TRIES 8		//Number to tries to find free random cell in neighbourhood
 
 
 class CellularAutomata
@@ -730,7 +731,7 @@ class CellularAutomata
 	// Update Division Rate of Biological Cell at (i,j)th loaction 
 	void CellularAutomata::updateDivisionRate( CellularAutomata CA[][12], int i, int j ) 
 	 {	 		 	
-	 	int tes;
+	 	int totalNumberOfESInNeighbourhood;
 	 	
 		int m;
 	 	int n;
@@ -738,16 +739,16 @@ class CellularAutomata
 	 	// Only if its a Biological Cell , update Degradation Potential
 	 	if( this->isBiologicalCell() )
  	 	 { 	 	 	
-			tes = numberOfESInNeighbourhood( CA, i, j);
+			totalNumberOfESInNeighbourhood = numberOfESInNeighbourhood( CA, i, j);
 
-		 	this->setDivisionRate( (float) tes / ( (float) (tes + 1) ) ); 	 	 	
+		 	this->setDivisionRate( (float) tes / ( (float) (totalNumberOfESInNeighbourhood + 1) ) ); 	 	 	
  	 	 }	 	
 	 }
 	 	
 	// Update Stiffness of Biological Cell at (i,j)th loaction 
 	void CellularAutomata::updateStiffness( CellularAutomata CA[][12], int i, int j )
 	 {
-	 	int tes;
+	 	int totalNumberOfESInNeighbourhood;
 	 	float sumOfCrossLinking;
 	 	float averageCrossLinking;
 	 	
@@ -758,15 +759,15 @@ class CellularAutomata
 	 	if( this->isBiologicalCell() )
  	 	 {
  	 	 	
-			tes = numberOfESInNeighbourhood( CA, i, j);
+			totalNumberOfESInNeighbourhood = numberOfESInNeighbourhood( CA, i, j);
 			
 			// test if there are no ES in neighbourhood
 			// If none then will the stiffness change or remain same
 			
-			if( tes )
+			if( totalNumberOfESInNeighbourhood )
 			 {
 			 	sumOfCrossLinking = summationOfCrossLinkingInNeighbourhood( CA, i, j );
-				averageCrossLinking = sumOfCrossLinking / ( (float) tes );				
+				averageCrossLinking = sumOfCrossLinking / ( (float) totalNumberOfESInNeighbourhood );				
 				
 				this->setStiffness( averageCrossLinking );			 	
 			 } 	 	 	
@@ -775,8 +776,7 @@ class CellularAutomata
 
 	// Update Degradation Potential of Biological Cell at (i,j)th loaction
 	void CellularAutomata::updateDegradationPotential( CellularAutomata CA[][12], int i, int j )
-	 {
-	 	int tes;
+	 {	 	
 	 	float sumOfFiberDensity;
 	 	float newDegradationPotential;
 	 	
@@ -785,11 +785,8 @@ class CellularAutomata
 	 	
 	 	// Only if its a Biological Cell , update Degradation Potential
 	 	if( this->isBiologicalCell() )
- 	 	 {
- 	 	 	
-			tes = numberOfESInNeighbourhood( CA, i, j);
-			
-			sumOfFiberDensity = summationOfFiberDensityOfESInNeighbourhood( CA, i, j );
+ 	 	 { 	 	 				
+			sumOfFiberDensity = (float) summationOfFiberDensityOfESInNeighbourhood( CA, i, j );
 			
 			newDegradationPotential = ( (float) sumOfFiberDensity / ( (float) (sumOfFiberDensity + 2)  ) );
 
@@ -800,7 +797,7 @@ class CellularAutomata
 	// Update Fiber Density of ECM Site at (i,j)th loaction	
 	void CellularAutomata::updateFiberDensity( CellularAutomata CA[][12], int i, int j )
 	 {
-	 	int tbc;
+	 	int totalNumberoFBiologicalCellInNeighbourhood;
 	 	float sumOfDegradationPotential;
 	 	float averageDegradationPotential;
 	 	
@@ -809,14 +806,14 @@ class CellularAutomata
 	 	
 	 	if( this->isECMSite() )
  	 	 {
-			tbc = numberOfBiologicalCellInNeighbourhood( CA, i, j);
+			totalNumberoFBiologicalCellInNeighbourhood = numberOfBiologicalCellInNeighbourhood( CA, i, j);
 			
 			// Only if total number of Biological cell in Neighbourhood is Not Zero , update Fiber Density of present cell
 			if( tbc )
 			 {
 				sumOfDegradationPotential = summationOfDegradationPotentialInNeighbourhood( CA, i, j );
 				
-				averageDegradationPotential = sumOfDegradationPotential / tbc;
+				averageDegradationPotential = sumOfDegradationPotential / totalNumberoFBiologicalCellInNeighbourhood;
 				
 				// If Fiber Density already zero - we need not calculate new Fiber Density				
 		
@@ -828,7 +825,7 @@ class CellularAutomata
 	// return sum of number Of ECM Site In Neighbourhood of (i,j) th Cell 
 	int CellularAutomata::numberOfESInNeighbourhood( CellularAutomata CA[][12], int i, int j )
 	 {
-	 	int tes = 0;
+	 	int totalNumberOfESInNeighbourhood = 0;
 	 	int m;
 	 	int n;
 	 	
@@ -840,18 +837,18 @@ class CellularAutomata
 			   	// If its a ECM Site inclrease count
 	 	 	 	if( !( m==0 && n==0 ) && CA[i+m][j+n].isECMSite() )
 	 	 	 	 {
-	 	 	 	 	tes ++;
+	 	 	 	 	totalNumberOfESInNeighbourhood ++;
 	 	 	 	 }
 	 	 	 }
 	 	 }
 
-		return tes;
+		return totalNumberOfESInNeighbourhood;
 	 }					
 	
 	// return sum of number Of Biological Cell In Neighbourhood of (i,j) th Cell
 	int CellularAutomata::numberOfBiologicalCellInNeighbourhood( CellularAutomata CA[][12], int i , int j )
 	 {
-	 	int tbc = 0;
+	 	int totalNumberoFBiologicalCellInNeighbourhood = 0;
 	 	int m;
 	 	int n;
 	 	
@@ -863,12 +860,12 @@ class CellularAutomata
 	 	 	 	// If its a Biological Cell Increase the count
 				if( !( m==0 && n==0 ) && CA[i+m][j+n].isBiologicalCell() )
 	 	 	 	 {
-	 	 	 	 	tbc ++;
+	 	 	 	 	totalNumberoFBiologicalCellInNeighbourhood ++;
 	 	 	 	 }
 	 	 	 }
 	 	 }	 	 	 	 
 	 	 
-	 	 return tbc;
+	 	 return totalNumberoFBiologicalCellInNeighbourhood;
 	 }
 
 	// return sum of Cross Linking Of ECM Sites In Neighbourhood of (i,j) th Cell
@@ -1115,7 +1112,7 @@ class CellularAutomata
 	 // condition to cell age , BETA and availability of free neighbour
 	 void CellularAutomata::updateStateOfTransientAmplifyingCell( CellularAutomata CA [][12], int i , int j )
 	  {
-	  	int tes;
+	  	int totalNumberOfESInNeighbourhood;
 	  	
 	  	if( this->getType() == TAC )		// Is (i,j)th cell a Transient Amplifying Cell
 	  	 {
@@ -1129,9 +1126,9 @@ class CellularAutomata
 			 	
 			 	// Check for free cells in neighbourhood - check if any ECM Site in Neighbourhood
 			 	
-			 	tes = this -> numberOfESInNeighbourhood( CA, i, j );			 				 	
+			 	totalNumberOfESInNeighbourhood = this -> numberOfESInNeighbourhood( CA, i, j );			 				 	
 			 	
-			 	if( tes )	// if free space exists
+			 	if( totalNumberOfESInNeighbourhood )	// if free space exists
 			 	 {
 			 	 	// Set Biological Set type to TAC and age to 0
 			 	 	
@@ -1149,8 +1146,9 @@ class CellularAutomata
 	   	int n;
 	   	
 	   	int freeCellNotFound = 1;
+		int tries = TRIES;
 	   	
-	   	while( freeCellNotFound )
+	   	while( freeCellNotFound && tries != 0 )
 	   	 {
 	   	 	m = rand() % 3 - 1;
 			n = rand() % 3 - 1;
@@ -1162,6 +1160,7 @@ class CellularAutomata
 			   	
 			   	freeCellNotFound = 0;
 	 	 	 }
+			tries--;
 	   	 }
 	   }
 	   
@@ -1183,14 +1182,13 @@ class CellularAutomata
 	 // condition to ALPHA and availability of free neighbour
 	 void CellularAutomata::updateStateOfCancerStemCell( CellularAutomata CA[][12], int i, int j )
 	  {	  	
-	  	int tes;	  	
-	  	float alp;
-	  	
+	  	int totalNumberOfESInNeighbourhood;	  	
+
 	  	if( this -> getType() ==  CSC)
 	  	 {  	 	 	
-  	 	 	tes = this -> numberOfESInNeighbourhood( CA, i, j );
+  	 	 	totalNumberOfESInNeighbourhood = this -> numberOfESInNeighbourhood( CA, i, j );
 		 	
-		 	if( tes )	// if free space exists
+		 	if( totalNumberOfES )	// if free space exists
 		 	 {
 		 	 	// Set Biological Set type to TAC and age to 0
 		 	 	
@@ -1207,10 +1205,13 @@ class CellularAutomata
 	   	double alp;
 	   	
 	   	int freeCellNotFound = 1;
+		int tries = TRIES;
 	   	
 	   	alp =  rand()/ (double) RAND_MAX ;		// Generate random number between (0,1)
+
+		// limit number of tries
 	   	
-	   	while( freeCellNotFound )
+	   	while( freeCellNotFound && tries !=0 )
 	   	 {
 	   	 	m = rand() % 3 - 1;
 			n = rand() % 3 - 1;
@@ -1220,13 +1221,17 @@ class CellularAutomata
 	 	 	 	if( alp <= ALPHA)
 	 	 	 	 {
 	 	 	 	 	CA[i+m][j+n].setType(TAC);
+					CA[i+m][j+n].setAge(0);
 	 	 	 	 }
 	 	 	 	else
 				 {
 				 	CA[i+m][j+n].setType(CSC);
+					CA[i+m][j+n].setAge(0);
 				 }   
 			   	
 			   	freeCellNotFound = 0;
-	 	 	 }	 	 	 
+	 	 	 }
+
+			tries--;	 	 	 
 	   	 }
 	   }	  	 
