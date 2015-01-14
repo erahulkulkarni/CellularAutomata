@@ -1,0 +1,71 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+%opening
+\title{Stiffness mediated heterogeneity}
+\author{Rahul Kulkarni}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{Introduction}
+\section{Implemetation}
+\subsection{Program Flow}
+\subsection{Cell/ECM properties and their range}
+
+%Properties and their range
+\begin{table}
+ 
+\end{table}
+
+
+\subsection{Function details}
+
+\subsubsection{Update Division Rate}
+\begin{equation}
+ divisionRate = \frac{Number\ of\ ECM\ Sites\ in\ Neighbourhood}{ Number\ of\ ECM\ Sites\ in\ Neighbourhood\ +\ 1 }
+\end{equation}
+
+\subsubsection{Update Stiffness}
+\begin{equation}
+ stiffness = \frac{ \sum_{ \forall\ i\ and\ ECM\ Site\ \in\ Neighbourhood }\ crossLinking_i }{ Number\ of\ ECM\ Sites\ in\ Neighbourhood }
+\end{equation}
+
+\subsubsection{Update Degradation Potential}
+\begin{equation}
+ degradationPotential = \frac{\sum_{\forall\ i\ and\ ECM\ Site\  \in\ Neighbourhood} fiberDensity_i}
+ {{\sum_{\forall\ i\ and\ ES\  \in\ Neighbourhood} fiberDensity_i\ +\ 2}}
+\end{equation}
+
+\subsubsection{Update Fiber Density}
+\begin{equation}
+ fiberDensity_i = fiberDensity_i\ -\ 
+ \ fiberDensity_i\ *\ averageDegradationRate
+\end{equation} 
+where 
+\begin{equation}
+ Average\ Degradation\ Rate = \frac{\sum_{\forall\ i\ and\ BC\ \in\ Neighbourhood degradationPotential_i } }
+ { Number\ of\ BC\ in\ Neighbourhood }
+\end{equation}
+where BC is Biological Cell
+
+\subsubsection{Update State Of Transient Amplifying Cell}
+%\begin{verbatim}
+
+
+%\end{verbatim}
+
+ 
+ 
+
+
+
+
+\section{Results}
+
+\end{document}

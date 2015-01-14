@@ -1,3 +1,6 @@
+// Concept of Database - normalize functions
+// break it to atomic functions
+// Get Properties , Set Properties
 
 // class of Cellular Automata - containing properties of Biological Cell and ECM Sites
 
@@ -12,11 +15,19 @@
 
 // Optimize File Write function
 
+
 #include<stdlib.h>
 #include<time.h>
 #include <fstream>
 
 using namespace std;
+
+// Dimensions of cellular automata
+#define ROWS 10
+#define COLUMNS 10
+
+// number of time the simulations has to be run
+#define ITERATIONS 100
 	
 #define ECMSite 0	// type 0 - ECM site or ES
 #define CSC 1		// type 1 - Cancer Stem Cell
@@ -26,6 +37,8 @@ using namespace std;
 #define ALPHA 0.5
 #define BETA 25
 #define GAMMA 50
+
+
 
 class CellularAutomata
  {
@@ -133,16 +146,25 @@ class CellularAutomata
 	void setType(int );
 	
 	// type testers
-		
-	// returns 1 if Computational cell is Biological Cell
-	// returns 0 if Computational cell is not Biological Cell
-	int isBiologicalCell();
+	
+	// returns TRUE if Computational cell is Biological Cell
+	// returns FALSE if Computational cell is not Biological Cell
+	bool isBiologicalCell();
 	 
-	// returns 1 if Computational cell is ECM Site
-	// returns 0 if Computational cell is not ECM Site
- 	int isECMSite();
-	
-	
+	// returns TRUE if Computational cell is ECM Site
+	// returns FALSE if Computational cell is not ECM Site
+ 	bool isECMSite();
+
+	// returns TRUE if Computational cell is Cancer Stem Cell
+	bool isCancerStemCell();
+	 
+	// returns TRUE if Computational cell is Transient Amplifying Cell
+	bool isTransientAmplifyingCell();
+
+	// returns TRUE if Computational cell is Cancer Stem Cell
+	bool isTerminallyDifferentiatedCell();
+
+		
 	//getters and setters	
 	
 	int getAge();
@@ -409,14 +431,29 @@ class CellularAutomata
 	 	type = t;
 	 }
 		
-	int CellularAutomata::isBiologicalCell()
+	bool CellularAutomata::isBiologicalCell()
 	 {
-	 	return( getType() );
+	 	return( getType() == CSC || getType() == TAC || getType() == TDC );
 	 }
 	 	
- 	int CellularAutomata::isECMSite()
+ 	bool CellularAutomata::isECMSite()
 	 {
-	 	return( ! getType() );
+	 	return( getType() == ECMSite );
+	 }
+
+	bool isCancerStemCell()
+	 {
+	 	return( getType() == CSC );
+	 }
+	 
+	bool isTransientAmplifyingCell()
+	 {
+	 	return( getType() == TAC );	   
+	 }
+
+	bool isTerminallyDifferentiatedCell()
+	 {
+	 	return( getType() == TDC );	   
 	 }
 
 	int CellularAutomata::getAge()
@@ -531,10 +568,7 @@ class CellularAutomata
 	 	
 	 	int x;
 	 	int y;	 
-		
-		int temp;
-		int itr = 10; 		 	
-	 	
+	 		 	
 	 	// neighbours straight forward for inner cells than the boundary cell	 	
 	 	// for boundary cell - neighbours be toroid using modulus to find neighbours if cell in first row, column or last row, column
 	 	
@@ -545,27 +579,53 @@ class CellularAutomata
 	 	
 	 	//cout<<"\n In Update Function - ";	 		 	
 	 	
-	 	for( i=1; i<= CA[0][0].getRows() * CA[0][0].getColumns() ; i++ )
-	 	 { 		 	 	
-	 	 	CA[0][0].incrementAge(CA);
+		//Separate loop for increamenting age
+	 	
+	 	for( i=1; i<= this -> getRows(); i++ )
+	 	 {
+	 	 	for ( j=1; j<= this -> getColumns(); j++ )
+	 	 	 {
+			   if( CA[i][j].isBiologicalCell() )
+			    {
+			      CA[i][j].incrementAge();
+			    }
+	 	 	 }
+	 	 }
+
+	 	for( i=1; i<= ROWS * COLUMNS ; i++ )
+	 	 { 		 	 		 	 	
 	 	 	
 			x = rand() % 10 + 1;
 	 	 	y = rand() % 10 + 1; 	
 	 	 	
-	 	 	// order of execution matters?
-	 	 	
-	 	 	CA[x][y].updateDivisionRate(CA,x,y);
-			CA[x][y].updateStiffness(CA,x,y);
-			CA[x][y].updateDegradationPotential(CA,x,y);
-			CA[x][y].updateFiberDensity(CA,x,y);
+
+			if ( CA[x][y].isECMSite() )		// If it is ECM Site
+			 {
+			   CA[x][y].updateFiberDensity(CA,x,y);
+			 }
+			else					// then it is Biological Cell
+			 {
+			   CA[x][y].updateDivisionRate(CA,x,y);
+			   CA[x][y].updateStiffness(CA,x,y);
+			   CA[x][y].updateDegradationPotential(CA,x,y);
+			 }
+
 			
-			CA[x][y].updateStateOfTransientAmplifyingCell(CA,x,y);
-			CA[x][y].updateStateOfTerminallyDifferentiatedCell();
-			
-			CA[x][y].updateStateOfCancerStemCell(CA,x,y);
-			
-			//cin>>temp;
-			
+			if ( CA[x][y].isBiologicalCell() )			// If it is a Biological Cell
+			 {
+			   if ( CA[x][y].isTransientAmplifyingCell() )		// If it is a Transient Amplifying Cell
+			    {
+				CA[x][y].updateStateOfTransientAmplifyingCell(CA,x,y);			   
+			    }
+			   else if( CA[x][y].isTerminallyDifferentiatedCell() )	// Else If it is a Terminally Differentiated Cell
+			    {
+				CA[x][y].updateStateOfTerminallyDifferentiatedCell();
+			    }
+			   else 						// then it is a Cancer Stem Cell
+			    {
+				CA[x][y].updateStateOfCancerStemCell(CA,x,y);
+			    }
+			 }					
 			this -> writeResultsToFile(CA,itr, x, y);
 	 	 }
 	 	
@@ -577,23 +637,23 @@ class CellularAutomata
 	 	int i;
 	 	int j;
 	 	
-	 	for( i=1; i<= CA[0][0].getRows(); i++ )
+	 	for( i=1; i<= ROWS; i++ )
 	 	 {
-	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
+	 	 	for ( j=1; j<= COLUMNS; j++ )
 	 	 	 {
 	 	 	 	// user / pre  defined values , and parameter list
 	 	 	 	
-	 	 	 	if( type > 0 )
-	 	 	 	 {
-	 	 	 	 	// parameter list
-	 	 	 	 	// int type, int age, float stiffness, float divisionRate, int size, float contractility, float invasiveness, float degradationPotential, float sensingRadius
-	 	 	 	 	CA[i][j].setBiologicalCellProperties(type, age, stiffness, divisionRate, size,	contractility, invasiveness, degradationPotential, sensingRadius);	 	 	 	 	
-	 	 	 	 }
-	 	 	 	else
+	 	 	 	if( type == ESMSite )
 	 	 	 	 {
 	 	 	 	 	// parameter list
 	 	 	 	 	// type, fiberDensity, crossLinking
 	 	 	 	 	CA[i][j].setECMSiteProperties(type, fiberDensity, crossLinking);	 	 	 	 	
+	 	 	 	 }
+	 	 	 	else	// It is Biological Cell
+	 	 	 	 {
+	 	 	 	 	// parameter list
+	 	 	 	 	// int type, int age, float stiffness, float divisionRate, int size, float contractility, float invasiveness, float degradationPotential, float sensingRadius
+	 	 	 	 	CA[i][j].setBiologicalCellProperties(type, age, stiffness, divisionRate, size,	contractility, invasiveness, degradationPotential, sensingRadius);
 	 	 	 	 }
 	 	 	 }
 	 	 }
@@ -908,9 +968,9 @@ class CellularAutomata
 		typeFileStream<<"\nALPHA "<<ALPHA<<"\nBETA "<<BETA<<"\nGAMMA "<<GAMMA<<endl;		
 		
 		// Write Identity of cells as a matrix which corresponding to cell location
-		for( i=1; i<= CA[0][0].getRows(); i++ )
+		for( i=1; i<= ROWS; i++ )
 	 	 {
-	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
+	 	 	for ( j=1; j<= COLUMNS; j++ )
 	 	 	 {
 	 	 	 	identity = CA[i][j].getIdentity();
 	 	 	 	
@@ -1013,9 +1073,9 @@ class CellularAutomata
 									
 		// Get Division Rate , Stiffness , Degradation Potential , Fiber Density , Cross Linking , Age and Type
 		// for each cell and write it into respective files
-		for( i=1; i<= CA[0][0].getRows(); i++ )
+		for( i=1; i<= ROWS; i++ )
 	 	 {
-	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
+	 	 	for ( j=1; j<= COLUMNS; j++ )
 	 	 	 {
 	 	 	 	divisionRateFileStream << CA[i][j].getDivisionRate()<<" ";
 	 	 	 	stiffnessFileStream << CA[i][j].getStiffness()<<" ";
@@ -1046,22 +1106,9 @@ class CellularAutomata
 	 }
 
 	// Increment age of All Biological Cells by a unit
-	void CellularAutomata::incrementAge(CellularAutomata CA[][12])
+	void CellularAutomata::incrementAge()
 	 {
-	 	int i;
-	 	int j;
-	 	
-	 	for( i=1; i<= CA[0][0].getRows(); i++ )
-	 	 {
-	 	 	for ( j=1; j<= CA[0][0].getColumns(); j++ )
-	 	 	 {
-	 	 	 	if ( CA[i][j].isBiologicalCell()  )
-	 	 	 	 {
-	 	 	 	 	CA[i][j].setAge( CA[i][j].getAge() + 1 );
-	 	 	 	 }
-	 	 	 }	 	 	
-	 	 }
-	 	
+ 	   this -> setAge( CA[i][j].getAge() + 1 );	 	
 	 }
 	 
 	 // Update state / Division of Transient Amplifying Cell to Terminally Differentiated Cells or Transient Amplifying Cell
